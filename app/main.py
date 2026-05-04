@@ -1,14 +1,29 @@
 from fastapi import FastAPI
-from app.models import SearchRequest
+from pydantic import BaseModel
 from app.engine import search_similar
 
 app = FastAPI()
 
+
+class ProposalInput(BaseModel):
+    title: str = ""
+    description: str = ""
+    objectives: str = ""
+    methodology: str = ""
+
+
 @app.get("/")
 def home():
-    return{"message": "Similarity Engine Running"}
+    return {"message": "Similarity Engine Running"}
+
 
 @app.post("/search")
-def search(req: SearchRequest):
-    results = search_similar(req.query, req.top_k)
-    return {"results": results}
+def search(data: ProposalInput):
+    query = f"""
+    {data.title} {data.title}
+    {data.description}
+    {data.objectives}
+    {data.methodology}
+    """
+
+    return search_similar(query)

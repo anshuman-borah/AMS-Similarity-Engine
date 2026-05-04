@@ -3,15 +3,23 @@ import faiss
 import numpy as np
 from app.data import get_documents
 
-documents = get_documents()
-
+# Load model
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
+# Load documents
+documents = get_documents()
+
+if len(documents) == 0:
+    raise ValueError("No documents available for similarity search")
+
+# Create embeddings
 doc_embeddings = model.encode(documents)
 
+# FAISS index
 dimension = doc_embeddings.shape[1]
 index = faiss.IndexFlatL2(dimension)
 
+# Add vectors (convert to float32)
 index.add(np.array(doc_embeddings).astype("float32"))
 
 
@@ -28,7 +36,7 @@ def search_similar(query: str, top_k: int = 3):
 
         results.append({
             "text": documents[int(idx)],
-            "score": round(float(score) * 100, 2)
+            "score": round(score * 100, 2)
         })
 
     return results
